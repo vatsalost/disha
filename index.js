@@ -74,7 +74,13 @@ Reply as Disha in Hinglish:
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
-  const isPing = message.mentions.has(client.user);
+  const botMention = `<@${client.user.id}>`;
+  const botMentionNick = `<@!${client.user.id}>`;
+
+  let content = message.content.trim();
+
+  const isPing =
+    content.startsWith(botMention) || content.startsWith(botMentionNick);
 
   let isReply = false;
   if (message.reference?.messageId) {
@@ -88,9 +94,18 @@ client.on("messageCreate", async (message) => {
 
   if (!isPing && !isReply) return;
 
-  if (!message.content.toLowerCase().startsWith("disha")) return;
+  // Remove bot mention if present
+  if (isPing) {
+    content = content
+      .replace(botMention, "")
+      .replace(botMentionNick, "")
+      .trim();
+  }
 
-  const userText = message.content.replace(/^disha/i, "").trim();
+  // NOW check for name
+  if (!content.toLowerCase().startsWith("disha")) return;
+
+  const userText = content.replace(/^disha/i, "").trim();
   if (!userText) return;
 
   await message.channel.sendTyping();
