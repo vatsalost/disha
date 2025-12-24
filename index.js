@@ -16,11 +16,42 @@ const client = new Client({
 client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
-  console.log("MESSAGE:", message.content);
+  let content = message.content.trim();
 
-  if (!message.content.toLowerCase().startsWith("disha")) return;
+  // Check ping
+  const botMention = `<@${client.user.id}>`;
+  const botMentionNick = `<@!${client.user.id}>`;
 
-  await message.reply("Haan bolo 😌");
+  const isPing =
+    content.startsWith(botMention) || content.startsWith(botMentionNick);
+
+  // Check reply
+  let isReply = false;
+  if (message.reference?.messageId) {
+    try {
+      const repliedMsg = await message.channel.messages.fetch(
+        message.reference.messageId
+      );
+      isReply = repliedMsg.author.id === client.user.id;
+    } catch {}
+  }
+
+  if (!isPing && !isReply) return;
+
+  // Remove mention text if pinged
+  if (isPing) {
+    content = content
+      .replace(botMention, "")
+      .replace(botMentionNick, "")
+      .trim();
+  }
+
+  // Require name trigger
+  if (!content.toLowerCase().startsWith("disha")) return;
+
+  console.log("TRIGGERED MESSAGE:", content);
+
+  await message.reply("Haan sun rahi hoon 😌");
 });
 
 client.once("ready", () => {
