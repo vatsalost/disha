@@ -75,9 +75,19 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   const isPing = message.mentions.has(client.user);
-  const isReply =
-    message.reference &&
-    message.channel.messages.cache.get(message.reference.messageId)?.author.id === client.user.id;
+  let isReply = false;
+
+if (message.reference?.messageId) {
+  try {
+    const repliedMsg = await message.channel.messages.fetch(
+      message.reference.messageId
+    );
+    isReply = repliedMsg.author.id === client.user.id;
+  } catch (e) {
+    isReply = false;
+  }
+}
+
 
   if (!isPing && !isReply) return;
 
