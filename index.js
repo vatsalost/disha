@@ -75,25 +75,22 @@ client.on("messageCreate", async (message) => {
   if (message.author.bot) return;
 
   const isPing = message.mentions.has(client.user);
+
   let isReply = false;
-
-if (message.reference?.messageId) {
-  try {
-    const repliedMsg = await message.channel.messages.fetch(
-      message.reference.messageId
-    );
-    isReply = repliedMsg.author.id === client.user.id;
-  } catch (e) {
-    isReply = false;
+  if (message.reference?.messageId) {
+    try {
+      const repliedMsg = await message.channel.messages.fetch(
+        message.reference.messageId
+      );
+      isReply = repliedMsg.author.id === client.user.id;
+    } catch {}
   }
-}
-
 
   if (!isPing && !isReply) return;
 
   if (!message.content.toLowerCase().startsWith("disha")) return;
 
-  const userText = message.content.replace(/disha/i, "").trim();
+  const userText = message.content.replace(/^disha/i, "").trim();
   if (!userText) return;
 
   await message.channel.sendTyping();
@@ -120,11 +117,12 @@ if (message.reference?.messageId) {
 
     await message.reply(reply);
 
-  } catch (error) {
-    console.error(error);
-    message.reply("Acha sunna… thoda issue aa gaya 😔 phir try karte hain 💫");
+  } catch (err) {
+    console.error(err);
+    message.reply("Acha sunna… thoda issue aa gaya 😔");
   }
 });
+
 
 /* 🚀 Ready */
 client.once("ready", () => {
